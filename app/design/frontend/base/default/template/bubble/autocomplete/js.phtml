@@ -33,7 +33,6 @@ var engine = new Bloodhound({
     datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
     queryTokenizer: Bloodhound.tokenizers.whitespace,
     sufficient: <?php echo $helper->getLimit() ?>,
-    identify: function(obj) { return obj.sku; },
     prefetch: {
         url: '<?php echo $this->getUrl('autocomplete/product/json') ?>',
         cache: false, <!-- debug -->
@@ -65,15 +64,15 @@ jQuery('#search').typeahead({
                '</div>',
         suggestion: function(product) {
             var img = imgPlaceholder;
-            if (product.thumbnail && product.thumbnail != 'no_selection') {
-                img = baseUrlMedia + product.thumbnail;
+            if (product.i && product.i != 'no_selection') {
+                img = baseUrlMedia + product.i;
             }
-            return '<a href="' + baseUrl + product.url_path + '">' +
+            return '<a href="' + baseUrl + product.u + '">' +
                         '<div class="image">' +
                             '<img src="' + img + '">' +
                         '</div>' +
                         '<div class="info">' +
-                            '<span class="name">' + product.name + '</span>' +
+                            '<span class="name">' + product.n + '</span>' +
                             '<div class="price-box">' + formatSuggestionPrice(product, priceFormat) + '</div>' +
                         '</div>' +
                         '<div class="clearer"><!-- --></div>' +
@@ -83,34 +82,32 @@ jQuery('#search').typeahead({
 });
 
 jQuery('#search').bind('typeahead:selected', function(obj, product, name) {
-    window.location.href = baseUrl + product.url_path;
+    window.location.href = baseUrl + product.u;
 });
 
 function formatSuggestionPrice(product, priceFormat) {
     var price = '';
-    switch (product.type_id) {
-        case 'grouped':
-        case 'configurable':
-        case 'bundle':
+    switch (product.t) {
+        case '1':
             price = '<p class="minimal-price">' +
                         '<span class="price-label"><?php echo $this->__('Starting at:') ?>&nbsp;</span>' +
-                        '<span class="price">' + formatCurrency(product.min_price, priceFormat, false) + '</span>' +
+                        '<span class="price">' + formatCurrency(product.pm, priceFormat, false) + '</span>' +
                     '</p>';
             break;
         default:
-            if (parseFloat(product.final_price) < parseFloat(product.price)) {
+            if (parseFloat(product.pf) < parseFloat(product.p)) {
                 price += '<p class="old-price">' +
                              '<span class="price-label"><?php echo $this->__('Regular Price:') ?>&nbsp;</span>' +
-                             '<span class="price">' + formatCurrency(product.price, priceFormat, false) + '</span>' +
+                             '<span class="price">' + formatCurrency(product.p, priceFormat, false) + '</span>' +
                          '</p>' +
                          '<p class="special-price">' +
                              '<span class="price">' +
-                                 formatCurrency(product.price, priceFormat, false) +
+                                 formatCurrency(product.p, priceFormat, false) +
                              '</span>' +
                          '</p>';
             } else {
                 price += '<span class="price">' +
-                             formatCurrency(product.price, priceFormat, false) +
+                             formatCurrency(product.p, priceFormat, false) +
                          '</span>';
             }
     }

@@ -18,6 +18,11 @@ class Bubble_Autocomplete_ProductController extends Mage_Core_Controller_Front_A
             // return false;
         }
 
+        // ToDo: Reimplement caching
+        // see: https://gist.github.com/ivanweiler/694c0aaf23deab2a38a9
+        // better cache in Collection Data?
+        // http://stackoverflow.com/questions/15408003/magento-how-to-cache-a-productcollection
+
         // $cacheId = 'bubble_autocomplete_' . Mage::app()->getStore()->getId();
         // if (false === ($data = Mage::app()->loadCache($cacheId))) {
 
@@ -35,7 +40,28 @@ class Bubble_Autocomplete_ProductController extends Mage_Core_Controller_Front_A
         }
 
         if ($collection) {
-            $data = json_encode($collection->getData());
+
+            // ToDo: Enhance removing unneeded attributes from json (sadly not possible in getCollection directly without
+            // creating a custom db select)
+
+            $arr = array();
+            $types = array('grouped', 'configurable', 'bundle');
+
+            foreach ($collection as $product) {
+                $tmp = array(
+                    'n' => $product['name'],
+                    'i' => $product['thumbnail'],
+                    'u' => $product['url_path'],
+                    'pm' => $product['min_price'],
+                    'pf' => $product['final_price'],
+                    'p' => $product['price'],
+                    't' => in_array($types, $product['type_id']) ? 1 : 0 // 1 if of kind from $types
+                );
+
+                array_push($arr, $tmp);
+            }
+
+            $data = json_encode($arr);
 
             // $lifetime = Mage::helper('bubble_autocomplete')->getCacheLifetime();
             // Mage::app()->saveCache($data, $cacheId, array('block_html'), $lifetime);

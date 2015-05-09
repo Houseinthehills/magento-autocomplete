@@ -9,6 +9,12 @@
  */
 class Bubble_Autocomplete_Model_Observer
 {
+    /*
+     * ToDo:
+     *  http://stackoverflow.com/questions/9172755/get-view-count-for-magento-product-based-on-product-id
+     *  Make Sort Order controllable from Backend (Asc, Desc)
+     */
+
     /**
      * Attached to: bubble_autocomplete_product_collection_init
      *
@@ -28,7 +34,6 @@ class Bubble_Autocomplete_Model_Observer
         $storeId = Mage::app()->getStore()->getId();
 
         $collection
-            ->setPageSize(Mage::helper('bubble_autocomplete')->getPrefetchLimit()) // limit prefetched db rows
             ->addStoreFilter($storeId)
 
             ->addFieldToFilter('visibility', Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH)
@@ -39,7 +44,11 @@ class Bubble_Autocomplete_Model_Observer
             ->addAttributeToFilter('url_path', array('notnull' => true))
 
             ->addPriceData()
-            ->setOrder('name', Varien_Data_Collection::SORT_ORDER_ASC);
+            ->setOrder('name', Varien_Data_Collection::SORT_ORDER_ASC)
+
+            ->getSelect()
+            ->limit(Mage::helper('bubble_autocomplete')->getPrefetchLimit()); // limit prefetched db rows
+
     }
 
     /**
@@ -60,7 +69,6 @@ class Bubble_Autocomplete_Model_Observer
         $storeId = Mage::app()->getStore()->getId();
 
         $collection
-            ->setPageSize(Mage::helper('bubble_autocomplete')->getLimit()) // limit fetched db rows
             ->addStoreFilter($storeId)
 
             ->addFieldToFilter('visibility', Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH)
@@ -73,6 +81,9 @@ class Bubble_Autocomplete_Model_Observer
             ->addAttributeToFilter('url_path', array('notnull' => true))
 
             ->addPriceData()
-            ->setOrder('name', Varien_Data_Collection::SORT_ORDER_ASC);
+            ->setOrder('name', Varien_Data_Collection::SORT_ORDER_ASC)
+
+            ->getSelect()
+            ->limit(Mage::helper('bubble_autocomplete')->getLimit()); // limit db rows requested by ajax
     }
 }
