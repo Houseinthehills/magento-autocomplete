@@ -32,15 +32,17 @@ var imgPlaceholder = '<?php echo Mage::getModel('catalog/product')->getSmallImag
 var engine = new Bloodhound({
     datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
     queryTokenizer: Bloodhound.tokenizers.whitespace,
-    limit: <?php echo $helper->getLimit() ?>,
-    <?php if ($helper->getUseLocalStorage()): ?>
+    sufficient: <?php echo $helper->getLimit() ?>,
+    identify: function(obj) { return obj.sku; },
     prefetch: {
         url: '<?php echo $this->getUrl('autocomplete/product/json') ?>',
+        cache: false, <!-- debug -->
         ttl: <?php echo $helper->getCacheLifetime() * 1000 ?> // milliseconds
+    },
+    remote: {
+        url: '<?php echo $this->getUrl('autocomplete/product/json') ?>?query=%QUERY',
+        wildcard: '%QUERY'
     }
-    <?php else: ?>
-    remote: { url: '<?php echo $this->getUrl('autocomplete/product/json') ?>' }
-    <?php endif; ?>
 });
 
 // kicks off the loading/processing of `local` and `prefetch`
@@ -49,7 +51,8 @@ engine.initialize();
 jQuery('#search').typeahead({
     hint: true,
     highlight: true,
-    minLength: <?php echo $helper->getMinLength() ?>
+    minLength: <?php echo $helper->getMinLength() ?>,
+    limit: <?php echo $helper->getLimit() ?>
 }, {
     name: 'products',
     displayKey: 'name',

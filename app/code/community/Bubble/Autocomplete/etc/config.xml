@@ -30,6 +30,14 @@
                     </bubble_autocomplete>
                 </observers>
             </bubble_autocomplete_product_collection_init>
+            <bubble_autocomplete_product_collection_livesearch_init>
+                <observers>
+                    <bubble_autocomplete>
+                        <class>bubble_autocomplete/observer</class>
+                        <method>onProductCollectionLiveSearchInit</method>
+                    </bubble_autocomplete>
+                </observers>
+            </bubble_autocomplete_product_collection_livesearch_init>
         </events>
     </global>
     <frontend>
@@ -63,10 +71,10 @@
         <bubble_autocomplete>
             <general>
                 <enable>1</enable>
+                <prefetchlimit>100</prefetchlimit>
                 <limit>5</limit>
                 <min_length>1</min_length>
                 <cache_lifetime>86400</cache_lifetime>
-                <use_local_storage>1</use_local_storage>
                 <enable_jquery>1</enable_jquery>
             </general>
         </bubble_autocomplete>

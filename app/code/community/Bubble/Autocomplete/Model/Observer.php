@@ -24,11 +24,55 @@ class Bubble_Autocomplete_Model_Observer
     {
         /** @var Mage_Catalog_Model_Resource_Product_Collection $collection */
         $collection = $observer->getEvent()->getCollection();
-        $collection->addAttributeToFilter('name', array('notnull' => true))
+
+        $storeId = Mage::app()->getStore()->getId();
+
+        $collection
+            ->setPageSize(Mage::helper('bubble_autocomplete')->getPrefetchLimit()) // limit prefetched db rows
+            ->addStoreFilter($storeId)
+
+            ->addFieldToFilter('visibility', Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH)
+            ->addFieldToFilter('status',Mage_Catalog_Model_Product_Status::STATUS_ENABLED)
+
+            ->addAttributeToFilter('name', array('notnull' => true))
             ->addAttributeToFilter('thumbnail', array('notnull' => true))
             ->addAttributeToFilter('url_path', array('notnull' => true))
-            ->addStoreFilter()
+
             ->addPriceData()
-            ->setVisibility(Mage::getSingleton('catalog/product_visibility')->getVisibleInSiteIds());
+            ->setOrder('name', Varien_Data_Collection::SORT_ORDER_ASC);
+    }
+
+    /**
+     * Attached to: bubble_autocomplete_product_collection_livesearch_init
+     *
+     * This is the default Ajax live search collection initialization.
+     * Feel free to add some fields by observing the event too or to disable this
+     * one and add your custom logic.
+     *
+     * @param Varien_Event_Observer $observer
+     */
+    public function onProductCollectionLiveSearchInit(Varien_Event_Observer $observer)
+    {
+        /** @var Mage_Catalog_Model_Resource_Product_Collection $collection */
+        $collection = $observer->getEvent()->getCollection();
+        $queryString = $observer->getEvent()->getData('queryString');
+
+        $storeId = Mage::app()->getStore()->getId();
+
+        $collection
+            ->setPageSize(Mage::helper('bubble_autocomplete')->getLimit()) // limit fetched db rows
+            ->addStoreFilter($storeId)
+
+            ->addFieldToFilter('visibility', Mage_Catalog_Model_Product_Visibility::VISIBILITY_BOTH)
+            ->addFieldToFilter('status',Mage_Catalog_Model_Product_Status::STATUS_ENABLED)
+
+            ->addFieldToFilter('name', array('like' => $queryString.'%')) // $queryString is parameterized
+
+            ->addAttributeToFilter('name', array('notnull' => true))
+            ->addAttributeToFilter('thumbnail', array('notnull' => true))
+            ->addAttributeToFilter('url_path', array('notnull' => true))
+
+            ->addPriceData()
+            ->setOrder('name', Varien_Data_Collection::SORT_ORDER_ASC);
     }
 }

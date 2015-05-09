@@ -14,6 +14,11 @@ class Bubble_Autocomplete_Helper_Data extends Mage_Core_Helper_Abstract
         return Mage::getStoreConfigFlag('bubble_autocomplete/general/enable', $store);
     }
 
+    public function getPrefetchLimit($store = null)
+    {
+        return (int) Mage::getStoreConfig('bubble_autocomplete/general/prefetchlimit', $store);
+    }
+
     public function getLimit($store = null)
     {
         return (int) Mage::getStoreConfig('bubble_autocomplete/general/limit', $store);
@@ -27,11 +32,6 @@ class Bubble_Autocomplete_Helper_Data extends Mage_Core_Helper_Abstract
     public function getCacheLifetime($store = null)
     {
         return (int) Mage::getStoreConfig('bubble_autocomplete/general/cache_lifetime', $store);
-    }
-
-    public function getUseLocalStorage($store = null)
-    {
-        return Mage::getStoreConfigFlag('bubble_autocomplete/general/use_local_storage', $store);
     }
 
     public function getJsPriceFormat()
