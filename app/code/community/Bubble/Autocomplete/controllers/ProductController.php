@@ -12,16 +12,20 @@ class Bubble_Autocomplete_ProductController extends Mage_Core_Controller_Front_A
      */
     public function jsonAction()
     {
-        // simple safety function: skip non ajax requests, XmlHttpRequest is set by jQuery/Scriptaculous/Prototype
-        // see: http://stackoverflow.com/questions/10911862/check-if-request-was-sent-by-ajax-or-not
+        /*
+         * skip non ajax requests, XmlHttpRequest is set by jQuery/Scriptaculous/Prototype
+         * see: http://stackoverflow.com/questions/10911862/check-if-request-was-sent-by-ajax-or-not
+         */
         if (!$this->getRequest()->isXmlHttpRequest()) {
             // return false;
         }
 
-        // ToDo: Reimplement caching
-        // see: https://gist.github.com/ivanweiler/694c0aaf23deab2a38a9
-        // better cache in Collection Data?
-        // http://stackoverflow.com/questions/15408003/magento-how-to-cache-a-productcollection
+        /*
+         * ToDo: Reimplement caching
+         * see: https://gist.github.com/ivanweiler/694c0aaf23deab2a38a9
+         * better cache in Collection Data?
+         * http://stackoverflow.com/questions/15408003/magento-how-to-cache-a-productcollection
+         */
 
         // $cacheId = 'bubble_autocomplete_' . Mage::app()->getStore()->getId();
         // if (false === ($data = Mage::app()->loadCache($cacheId))) {
@@ -41,21 +45,24 @@ class Bubble_Autocomplete_ProductController extends Mage_Core_Controller_Front_A
 
         if ($collection) {
 
-            // ToDo: Enhance removing unneeded attributes from json (sadly not possible in getCollection directly without
-            // creating a custom db select)
+            /*
+             * Map attributes of returned collection: just use the attributes we really need in frontend js.phtml.
+             * Sadly it's not possible to limit the columns in ->getCollection without modifying the underlying Zend
+             * db select (or at least using a trick like getSelect()->reset(Zend_Db_Select::COLUMNS)->columns('..').
+             */
 
             $arr = array();
             $types = array('grouped', 'configurable', 'bundle');
 
             foreach ($collection as $product) {
                 $tmp = array(
-                    'n' => $product['name'],
-                    'i' => $product['thumbnail'],
-                    'u' => $product['url_path'],
+                    'n'  => $product['name'],
+                    'u'  => $product['url_path'],
+                    'i'  => $product['thumbnail'],
                     'pm' => $product['min_price'],
                     'pf' => $product['final_price'],
-                    'p' => $product['price'],
-                    't' => in_array($types, $product['type_id']) ? 1 : 0 // 1 if of kind from $types
+                    'p'  => $product['price'],
+                    't'  => in_array($types, $product['type_id']) ? 1 : 0
                 );
 
                 array_push($arr, $tmp);
@@ -67,7 +74,7 @@ class Bubble_Autocomplete_ProductController extends Mage_Core_Controller_Front_A
             // Mage::app()->saveCache($data, $cacheId, array('block_html'), $lifetime);
 
             $this->getResponse()
-                ->setHeader('Content-Type', 'application/json', true)// overwrite Response Headers to ensure compatibility with Apache/fcgi
+                ->setHeader('Content-Type', 'application/json', true) // true = ensure compatibility with Apache/fcgi
                 ->setBody($data);
         }
 

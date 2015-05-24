@@ -76,6 +76,8 @@
                 <min_length>1</min_length>
                 <cache_lifetime>86400</cache_lifetime>
                 <enable_jquery>1</enable_jquery>
+                <enable_ajax_livesearch>1</enable_ajax_livesearch>
+                <ajax_ratelimitwait>300</ajax_ratelimitwait>
             </general>
         </bubble_autocomplete>
     </default>
